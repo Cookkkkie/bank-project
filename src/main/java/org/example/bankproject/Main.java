@@ -24,7 +24,7 @@ public class Main {
         }
 
         while (true) {
-            System.out.println("Dear " + currentUser.getName() + ", what operation would you like to do?\n1) Checking current balance\n2) Deposit\n3) Withdrawal\n4) Make a transaction\n5) Exit");
+            System.out.printf("Dear %s, what operation would you like to do?\n1) Checking current balance\n2) Deposit\n3) Withdrawal\n4) Make a transaction\n5) Exit%n", currentUser.getName());
             int choice = sc.nextInt();
             sc.nextLine();
 
@@ -35,34 +35,35 @@ public class Main {
                 case 2:
                     System.out.println("How much would you like to deposit?");
                     double deposit = sc.nextDouble();
-                    if (deposit < 0) {
-                        System.out.println("You cannot deposit a negative amount.");
-                    } else {
-                        currentUser.getBankAccount().deposit(deposit);
-                        DBSetup.updateUserBalance(currentUser.getName(), currentUser.getSecondName(), currentUser.getBankAccount().getBalance());
-                    }
+                    currentUser.getBankAccount().deposit(deposit);
+                    DATABASE.updateBalance(currentUser);
                     break;
 
                 case 3:
                     System.out.println("How much would you like to withdraw?");
                     double withdraw = sc.nextDouble();
-                    if (withdraw < 0) {
-                        System.out.println("You cannot withdraw a negative amount.");
-                    } else {
-                        currentUser.getBankAccount().withdraw(withdraw);
-                        DBSetup.updateUserBalance(currentUser.getName(), currentUser.getSecondName(), currentUser.getBankAccount().getBalance());
-                    }
+                    currentUser.getBankAccount().withdraw(withdraw);
+                    DATABASE.updateBalance(currentUser);
                     break;
 
                 case 4:
                     System.out.println("Please, write receiver full name and how much you want to send in format: Name Surname, AMOUNT");
                     String request = sc.nextLine();
 
-                    sendMoney(request);
-                    currentUser.getBankAccount().withdraw(Double.parseDouble(request.split(",")[1]));
-                    DBSetup.updateUserBalance(currentUser.getName(),
-                            currentUser.getSecondName(),
-                            currentUser.getBankAccount().getBalance());
+                    String[] tmp = request.split(",");
+
+                    String fullName = tmp[0].trim();
+                    double amount = Double.parseDouble(tmp[1]);
+
+                    String[] nameParts = fullName.split(" ");
+                    String firstName = nameParts[0];
+                    String lastName = nameParts[1];
+
+
+                    DATABASE.sendMoney(firstName, lastName, amount);
+                    currentUser.getBankAccount().withdraw(amount);
+                    DATABASE.updateBalance(currentUser);
+
                     break;
                 case 5:
                     System.exit(0);
@@ -81,7 +82,7 @@ public class Main {
         String password = sc.nextLine();
 
         User user = new User(name, surname, password, new BankAccount(0));
-        DBSetup.registerUser(user);
+        DATABASE.registerUser(user);
         return user;
     }
 
@@ -90,26 +91,8 @@ public class Main {
         String name = sc.nextLine();
         System.out.println("Enter your password:");
         String password = sc.nextLine();
-
-        return DBSetup.readUser(name, password);
+        return DATABASE.readUser(name, password);
     }
 
-    public static void sendMoney(String request) {
-        String[] tmp = request.split(",");
 
-        String fullName = tmp[0].trim();
-        double amount = Double.parseDouble(tmp[1]);
-
-        String[] nameParts = fullName.split(" ");
-        String firstName = nameParts[0];
-        String lastName = nameParts[1];
-
-        User receiver = DBSetup.readUser(firstName, lastName);
-        if (receiver != null) {
-            double newBalance = receiver.getBankAccount().getBalance() + amount;
-            DBSetup.updateUserBalance(firstName, lastName, newBalance);
-        } else {
-            System.out.println("Receiver not found!");
-        }
-    }
 }
