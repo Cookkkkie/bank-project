@@ -18,9 +18,12 @@ public class BankAccountTest {
 
     void testWithdraw() {
         BankAccount account = new BankAccount(100.0);
+        User user = new User("q", "q", "q",account);
         account.withdraw(-50.0);
-        assertEquals(50.0, account.getBalance());
-        assertNotEquals(150.0, account.getBalance());
+        DATABASE.updateBalance(user);
+
+        assertEquals(50.0, DATABASE.readUser("q","q").getBankAccount().getBalance());
+        assertNotEquals(150.0, DATABASE.readUser("q","q").getBankAccount().getBalance());
     }
 
     @Test

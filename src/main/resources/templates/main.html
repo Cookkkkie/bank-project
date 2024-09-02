@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page - Bank</title>
+</head>
+<body>
+<h1>Monobank</h1>
+<p>Your current balance is: <span th:text="${user.bankAccount.balance}">0</span> $</p>
+
+<h2>Available Operations</h2>
+<form action="/deposit" method="post">
+    <input type="number" name="amount" placeholder="Amount" required>
+    <input type="hidden" name="name" th:value="${user.name}">
+    <input type="hidden" name="password" th:value="${user.password}">
+    <button type="submit">Deposit</button>
+</form>
+
+<form action="/withdraw" method="post">
+    <input type="number" name="amount" placeholder="Amount" required>
+    <input type="hidden" name="name" th:value="${user.name}">
+    <input type="hidden" name="password" th:value="${user.password}">
+    <button type="submit">Withdraw</button>
+</form>
+
+<form action="/send" method="post">
+    <input type="text" name="receiver" placeholder="Person (First Last)" required>
+    <input type="number" name="amount" placeholder="Amount" required>
+    <input type="hidden" name="name" th:value="${user.name}">
+    <input type="hidden" name="password" th:value="${user.password}">
+    <button type="submit">Send</button>
+</form>
+
+<form action="/logout" method="post">
+    <button type="submit">Log out</button>
+</form>
+
+</body>
+</html>

@@ -1,7 +1,10 @@
 package org.example.bankproject;
 
+import org.springframework.stereotype.Component;
+
 import java.sql.*;
 
+@Component
 public class DATABASE {
 
 
@@ -64,22 +67,28 @@ public class DATABASE {
         return null;
     }
 
-    public static void sendMoney(String firstName,String lastName,double amount){
-
+    public static void sendMoney(String firstName, String lastName, double amount) {
         try (
                 Connection connection = DriverManager.getConnection("jdbc:sqlite:bank.db");
                 Statement statement = connection.createStatement();
         ) {
-            String updateSQL = String.format("UPDATE users SET balance = '%f' WHERE name = '%s' and second_name = '%s'",amount, firstName,lastName);
-            statement.executeUpdate(updateSQL);
-        }
-        catch (SQLException e) {
+            String querySQL = String.format("SELECT balance FROM users WHERE name = '%s' and second_name = '%s'", firstName, lastName);
+            ResultSet resultSet = statement.executeQuery(querySQL);
+
+            if (resultSet.next()) {
+                double currentBalance = resultSet.getDouble("balance");
+                double newBalance = currentBalance + amount;
+
+                String updateSQL = String.format("UPDATE users SET balance = '%f' WHERE name = '%s' and second_name = '%s'", newBalance, firstName, lastName);
+                statement.executeUpdate(updateSQL);
+            } else {
+                System.out.println("User not found");
+            }
+        } catch (SQLException e) {
             System.out.println(e.toString());
         }
-        System.out.println("User not found");
-
-
     }
+
 
     public static void updateBalance(User user) {
         String name = user.getName();

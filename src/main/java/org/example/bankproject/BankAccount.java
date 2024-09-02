@@ -18,9 +18,10 @@ public class BankAccount {
 
         if (amount < 0) {
             System.out.println("Amount must be positive");
+        } else {
+            this.balance += amount;
+            System.out.println("You successfully deposited " + amount + "$ to the bank.");
         }
-        this.balance += amount;
-        System.out.println("You successfully deposited " + amount + "$ to the bank.");
     }
 
     public void withdraw(double amount) {
