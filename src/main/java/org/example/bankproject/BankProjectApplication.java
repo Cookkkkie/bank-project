@@ -23,9 +23,6 @@ public class BankProjectApplication {
         SpringApplication.run(BankProjectApplication.class, args);
     }
 
-    @Value("${spring.application.name}")
-    String appName;
-
     @GetMapping("/")
     public String homePage() {
         return "redirect:/login";
@@ -72,10 +69,6 @@ public class BankProjectApplication {
         }
     }
 
-    @PostMapping("/start")
-    public String startPage() {
-        return "login";
-    }
 
     @PostMapping("/deposit")
     public String deposit(@RequestParam double amount, @RequestParam String name) {
