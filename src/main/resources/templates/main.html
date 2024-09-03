@@ -10,29 +10,31 @@
 <p>Your current balance is: <span th:text="${user.bankAccount.balance}">0</span> $</p>
 
 <h2>Available Operations</h2>
-<form>
-    <input type="number" name="amount" placeholder="Amount" required>
+<form action="/deposit" method="post">
+    <input type="number" name="amount" placeholder="amount" required>
     <input type="hidden" name="name" th:value="${user.name}">
     <input type="hidden" name="password" th:value="${user.password}">
     <button type="submit">Deposit</button>
 </form>
-<form>
+
+<form action="/withdraw" method="post">
     <input type="number" name="amount" placeholder="Amount" required>
     <input type="hidden" name="name" th:value="${user.name}">
     <input type="hidden" name="password" th:value="${user.password}">
     <button type="submit">Withdraw</button>
 </form>
 
-<form>
-
-
-    <input type="text" name="receiver" placeholder="Person (First Last)" required>
+<form action="/send_money" method="post">
+    <input type="text" name="receiverN" placeholder="receiverN" required>
+    <input type="text" name="receiverS" placeholder="receiverS" required>
     <input type="number" name="amount" placeholder="Amount" required>
     <input type="hidden" name="name" th:value="${user.name}">
     <input type="hidden" name="password" th:value="${user.password}">
     <button type="submit">Send</button>
 </form>
-<form action="/login" method="post">
+
+<form action="/main" method="get">
+    <input type="hidden" name="name" th:value="null">
     <button type="submit">Log out</button>
 </form>
 

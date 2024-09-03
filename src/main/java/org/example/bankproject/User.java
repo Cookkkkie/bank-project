@@ -20,6 +20,12 @@ public class User {
         this.bankAccount = bankAccount;
     }
 
+    public User(String name, String secondName, BankAccount bankAccount) {
+        this.name = name;
+        this.secondName = secondName;
+        this.bankAccount = bankAccount;
+    }
+
     public String getName() {return name;}
 
     public String getSecondName() {return secondName;}
@@ -35,7 +41,5 @@ public class User {
     public void setPassword(String password) {this.password = password;}
 
     public void setBankAccount(BankAccount bankAccount) {this.bankAccount = bankAccount;}
-
-
 
 }

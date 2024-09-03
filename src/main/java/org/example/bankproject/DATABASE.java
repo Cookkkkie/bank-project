@@ -1,12 +1,21 @@
 package org.example.bankproject;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.sql.*;
 
 @Component
 public class DATABASE {
+    private Connection connection;
+    private static Statement statement;
 
+    DATABASE() throws SQLException {
+        this.connection = DriverManager.getConnection("jdbc:sqlite:bank.db");
+        this.statement = connection.createStatement();
+    }
+    private static final Logger logger = LogManager.getLogger(BankProjectApplication.class);
 
     public static void main(String[] args) {
         try (
@@ -46,19 +55,18 @@ public class DATABASE {
     }
 
 
-    public static User readUser(String name, String password) {
+    public static User readUser(String name) {
         try (
                 Connection connection = DriverManager.getConnection("jdbc:sqlite:bank.db");
                 Statement statement = connection.createStatement();
         ) {
-            String querySQL = String.format("SELECT * FROM users WHERE name = '%s' and password = '%s'",name,password );
+            String querySQL = String.format("SELECT * FROM users WHERE name = '%s'",name );
             ResultSet resultSet = statement.executeQuery(querySQL);
             while (resultSet.next()) {
                 String secondName = resultSet.getString("second_name");
                 double balance = resultSet.getDouble("balance");
-                return new User(name,secondName,password,new BankAccount(balance));
+                return new User(name, secondName, new BankAccount(balance));
             }
-
 
         } catch (SQLException e) {
             e.printStackTrace(System.err);
@@ -67,25 +75,81 @@ public class DATABASE {
         return null;
     }
 
-    public static void sendMoney(String firstName, String lastName, double amount) {
+    public static User readUserLogin(String name, String password) {
         try (
                 Connection connection = DriverManager.getConnection("jdbc:sqlite:bank.db");
                 Statement statement = connection.createStatement();
         ) {
-            String querySQL = String.format("SELECT balance FROM users WHERE name = '%s' and second_name = '%s'", firstName, lastName);
+            String querySQL = String.format("SELECT * FROM users WHERE name = '%s' and password = '%s'",name, password);
             ResultSet resultSet = statement.executeQuery(querySQL);
+            while (resultSet.next()) {
+                String secondName = resultSet.getString("second_name");
+                double balance = resultSet.getDouble("balance");
+                return new User(name, secondName, new BankAccount(balance));
+            }
 
-            if (resultSet.next()) {
-                double currentBalance = resultSet.getDouble("balance");
-                double newBalance = currentBalance + amount;
+        } catch (SQLException e) {
+            e.printStackTrace(System.err);
+        }
+        System.out.println("User not found or password wrong");
+        return null;
+    }
 
-                String updateSQL = String.format("UPDATE users SET balance = '%f' WHERE name = '%s' and second_name = '%s'", newBalance, firstName, lastName);
-                statement.executeUpdate(updateSQL);
-            } else {
-                System.out.println("User not found");
+    public static void sendMoney(String firstName, String lastName, double amount, String sender) throws SQLException {
+        User senderUser = readUser(sender);
+
+        String selectSenderQuery = "SELECT * FROM users WHERE name = ? AND second_name = ?";
+        String selectReceiverQuery = "SELECT * FROM users WHERE name = ? AND second_name = ?";
+        String updateUserBalanceQuery = "UPDATE users SET balance = ? WHERE name = ? AND second_name = ?";
+
+        try (
+                Connection connection = DriverManager.getConnection("jdbc:sqlite:bank.db");
+                PreparedStatement selectSenderStmt = connection.prepareStatement(selectSenderQuery);
+                PreparedStatement selectReceiverStmt = connection.prepareStatement(selectReceiverQuery);
+                PreparedStatement updateUserBalanceStmt = connection.prepareStatement(updateUserBalanceQuery)
+        ) {
+
+            selectSenderStmt.setString(1, senderUser.getName());
+            selectSenderStmt.setString(2, senderUser.getSecondName());
+
+
+            try (ResultSet resultSetSender = selectSenderStmt.executeQuery()) {
+                if (!resultSetSender.next()) {
+                    return;
+                }
+
+                selectReceiverStmt.setString(1, firstName);
+                selectReceiverStmt.setString(2, lastName);
+
+
+                try (ResultSet resultSetReceiver = selectReceiverStmt.executeQuery()) {
+                    if (!resultSetReceiver.next()) {
+                        return;
+                    }
+
+                    double currentBalanceReceiver = resultSetReceiver.getDouble("balance");
+                    double newBalanceReceiver = currentBalanceReceiver + amount;
+
+                    double currentBalanceSender = resultSetSender.getDouble("balance");
+                    double newBalanceSender = currentBalanceSender - amount;
+
+
+                    updateUserBalanceStmt.setDouble(1, newBalanceReceiver);
+                    updateUserBalanceStmt.setString(2, firstName);
+                    updateUserBalanceStmt.setString(3, lastName);
+                    updateUserBalanceStmt.executeUpdate();
+
+
+                    updateUserBalanceStmt.setDouble(1, newBalanceSender);
+                    updateUserBalanceStmt.setString(2, senderUser.getName());
+                    updateUserBalanceStmt.setString(3, senderUser.getSecondName());
+                    updateUserBalanceStmt.executeUpdate();
+
+                }
             }
         } catch (SQLException e) {
-            System.out.println(e.toString());
+            logger.error("Error during money transfer", e);
+            throw e;
         }
     }
 

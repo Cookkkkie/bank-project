@@ -9,10 +9,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
+
+
 @SpringBootApplication
 @Controller
 public class BankProjectApplication {
     private static final Logger logger = LogManager.getLogger(BankProjectApplication.class);
+
     public static void main(String[] args) {
 
         logger.info("Application started");
@@ -33,11 +37,11 @@ public class BankProjectApplication {
     }
 
     @PostMapping("/login")
-    public String loginUser(@RequestParam String name, @RequestParam String password, Model model) {
-        User user = DATABASE.readUser(name, password);
+    public String loginUser(@RequestParam String name, @RequestParam String password,  Model model) {
+        User user = DATABASE.readUserLogin(name, password);
         if (user != null) {
             model.addAttribute("user", user);
-            return "redirect:/main?name=" + name + "&password=" + password;
+            return "redirect:/main?name=" + name;
         } else {
             model.addAttribute("error", "Invalid username or password.");
             return "login";
@@ -58,14 +62,43 @@ public class BankProjectApplication {
     }
 
     @GetMapping("/main")
-    public String mainPage(@RequestParam String name, @RequestParam String password, Model model) {
-        User user = DATABASE.readUser(name, password);
+    public String mainPage(@RequestParam String name, Model model) {
+        User user = DATABASE.readUser(name);
         if (user != null) {
             model.addAttribute("user", user);
             return "main";
         } else {
-            return "login";
+            return "redirect:/login?name=";
         }
     }
 
+    @PostMapping("/start")
+    public String startPage() {
+        return "login";
+    }
+
+    @PostMapping("/deposit")
+    public String deposit(@RequestParam double amount, @RequestParam String name) {
+        User user = DATABASE.readUser(name);
+        BankAccount bankAccount = user.getBankAccount();
+        bankAccount.deposit(amount);
+        DATABASE.updateBalance(user);
+        return "redirect:/main?name=" + name;
+    }
+
+
+    @PostMapping("/withdraw")
+    public String widthdraw(@RequestParam double amount, @RequestParam String name) {
+        User user = DATABASE.readUser(name);
+        BankAccount bankAccount = user.getBankAccount();
+        bankAccount.withdraw(amount);
+        DATABASE.updateBalance(user);
+        return "redirect:/main?name=" + name;
+    }
+
+    @PostMapping("/send_money")
+    public String send_money(@RequestParam String receiverN, @RequestParam String receiverS, @RequestParam double amount, @RequestParam String name) throws SQLException {
+        DATABASE.sendMoney(receiverN, receiverS, amount, name);
+        return "redirect:/main?name=" + name;
+    }
 }
