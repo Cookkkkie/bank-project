@@ -1,5 +1,7 @@
 package org.example.bankproject;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,8 +12,10 @@ import org.springframework.web.bind.annotation.*;
 @SpringBootApplication
 @Controller
 public class BankProjectApplication {
-
+    private static final Logger logger = LogManager.getLogger(BankProjectApplication.class);
     public static void main(String[] args) {
+
+        logger.info("Application started");
         SpringApplication.run(BankProjectApplication.class, args);
     }
 
@@ -64,54 +68,4 @@ public class BankProjectApplication {
         }
     }
 
-//    @PostMapping("/deposit")
-//    public String deposit(@RequestParam double amount, @RequestParam String name, @RequestParam String password, Model model) {
-//        User user = DATABASE.readUser(name, password);
-//        if (user != null) {
-//            user.getBankAccount().deposit(amount);
-//            DATABASE.updateBalance(user);
-//            model.addAttribute("user", user);
-//            model.addAttribute("message", "Deposit successful!");
-//            return "main";
-//        } else {
-//            return "login";
-//        }
-//    }
-//
-//    @PostMapping("/withdraw")
-//    public String withdraw(@RequestParam double amount, @RequestParam String name, @RequestParam String password, Model model) {
-//        User user = DATABASE.readUser(name, password);
-//        if (user != null) {
-//            user.getBankAccount().withdraw(amount);
-//            DATABASE.updateBalance(user);
-//            model.addAttribute("user", user);
-//            model.addAttribute("message", "Withdrawal successful!");
-//            return "main";
-//        } else {
-//            return "login";
-//        }
-//    }
-//
-//    @PostMapping("/send")
-//    public String sendMoney(@RequestParam String receiver, @RequestParam double amount, @RequestParam String name, @RequestParam String password, Model model) {
-//        User user = DATABASE.readUser(name, password);
-//        if (user != null) {
-//            String[] nameParts = receiver.split(" ");
-//            String firstName = nameParts[0];
-//            String lastName = nameParts[1];
-//            DATABASE.sendMoney(firstName, lastName, amount);
-//            user.getBankAccount().withdraw(amount);
-//            DATABASE.updateBalance(user);
-//            model.addAttribute("user", user);
-//            model.addAttribute("message", "Money sent successfully!");
-//            return "main";
-//        } else {
-//            return "login";
-//        }
-//    }
-//
-//    @PostMapping("/logout")
-//    public String logout() {
-//        return "redirect:/login";
-//    }
 }
