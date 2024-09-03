@@ -32,7 +32,6 @@ public class BankProjectApplication {
     public String loginPage() {
         return "login";
     }
-
     @PostMapping("/login")
     public String loginUser(@RequestParam String name, @RequestParam String password,  Model model) {
         User user = DATABASE.readUserLogin(name, password);
