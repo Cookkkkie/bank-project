@@ -12,8 +12,8 @@ public class DATABASE {
     private static Statement statement;
 
     DATABASE() throws SQLException {
-        this.connection = DriverManager.getConnection("jdbc:sqlite:bank.db");
-        this.statement = connection.createStatement();
+//        this.connection = DriverManager.getConnection("jdbc:sqlite:bank.db");
+//        this.statement = connection.createStatement();
     }
     private static final Logger logger = LogManager.getLogger(BankProjectApplication.class);
 
@@ -82,7 +82,7 @@ public class DATABASE {
         ) {
             String querySQL = String.format("SELECT * FROM users WHERE name = '%s' and password = '%s'",name, password);
             ResultSet resultSet = statement.executeQuery(querySQL);
-            while (resultSet.next()) {
+            if(resultSet.next()) {
                 String secondName = resultSet.getString("second_name");
                 double balance = resultSet.getDouble("balance");
                 return new User(name, secondName, new BankAccount(balance));
