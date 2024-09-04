@@ -7,6 +7,7 @@
     <link href="/style.css" rel="stylesheet">
 </head>
 <body>
+
 <div class="container">
     <h1>Welcome to your bank account!</h1>
     <p>Your current balance is: <span th:text="${user.bankAccount.balance}">0</span> $</p>
@@ -27,12 +28,14 @@
     </form>
 
     <form action="/send_money" method="post" class = "form-container">
+
         <input type="text" name="receiverN" placeholder="Receiver name" required>
         <input type="text" name="receiverS" placeholder="Receiver surname" required>
         <input type="number" name="amount" placeholder="Amount" required>
         <input type="hidden" name="name" th:value="${user.name}">
         <input type="hidden" name="password" th:value="${user.password}">
         <button type="submit">Send</button>
+
     </form>
 
     <form action="/main" method="get">

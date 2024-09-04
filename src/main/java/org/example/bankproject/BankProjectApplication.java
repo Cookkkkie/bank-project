@@ -31,6 +31,12 @@ public class BankProjectApplication {
     public String loginPage() {
         return "login";
     }
+
+    @GetMapping("/register")
+    public String registerPage() {
+        return "register";
+    }
+
     @PostMapping("/login")
     public String loginUser(@RequestParam String name, @RequestParam String password,  Model model) {
         User user = DATABASE.readUserLogin(name, password);
@@ -39,22 +45,19 @@ public class BankProjectApplication {
             return "redirect:/main?name=" + name;
         } else {
             model.addAttribute("error", "Invalid username or password.");
-            return "login";
+            return "redirect:/login?name=" + name;
         }
-    }
-
-    @GetMapping("/register")
-    public String registerPage() {
-        return "register";
     }
 
     @PostMapping("/register")
     public String registerUser(@RequestParam String name, @RequestParam String surname, @RequestParam String password, Model model) {
+        logger.info("Registering user");
         User user = new User(name, surname, password, new BankAccount(0));
         DATABASE.registerUser(user);
         model.addAttribute("message", "Registration successful! Please login.");
-        return "login";
+        return "redirect:/login?name=";
     }
+
 
     @GetMapping("/main")
     public String mainPage(@RequestParam String name, Model model) {

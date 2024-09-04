@@ -127,24 +127,25 @@ public class DATABASE {
                         return;
                     }
 
-                    double currentBalanceReceiver = resultSetReceiver.getDouble("balance");
-                    double newBalanceReceiver = currentBalanceReceiver + amount;
-
                     double currentBalanceSender = resultSetSender.getDouble("balance");
-                    double newBalanceSender = currentBalanceSender - amount;
+                    if(amount>currentBalanceSender){logger.info("Insufficient funds!");}else {
+                        double newBalanceSender = currentBalanceSender - amount;
+
+                        double currentBalanceReceiver = resultSetReceiver.getDouble("balance");
+                        double newBalanceReceiver = currentBalanceReceiver + amount;
 
 
-                    updateUserBalanceStmt.setDouble(1, newBalanceReceiver);
-                    updateUserBalanceStmt.setString(2, firstName);
-                    updateUserBalanceStmt.setString(3, lastName);
-                    updateUserBalanceStmt.executeUpdate();
+                        updateUserBalanceStmt.setDouble(1, newBalanceReceiver);
+                        updateUserBalanceStmt.setString(2, firstName);
+                        updateUserBalanceStmt.setString(3, lastName);
+                        updateUserBalanceStmt.executeUpdate();
 
 
-                    updateUserBalanceStmt.setDouble(1, newBalanceSender);
-                    updateUserBalanceStmt.setString(2, senderUser.getName());
-                    updateUserBalanceStmt.setString(3, senderUser.getSecondName());
-                    updateUserBalanceStmt.executeUpdate();
-
+                        updateUserBalanceStmt.setDouble(1, newBalanceSender);
+                        updateUserBalanceStmt.setString(2, senderUser.getName());
+                        updateUserBalanceStmt.setString(3, senderUser.getSecondName());
+                        updateUserBalanceStmt.executeUpdate();
+                    }
                 }
             }
         } catch (SQLException e) {
