@@ -17,7 +17,7 @@ public class BankProjectApplication {
     private static final Logger logger = LogManager.getLogger(BankProjectApplication.class);
 
     public static void main(String[] args) {
-
+        DATABASE.main(args);
         logger.info("Application started");
         SpringApplication.run(BankProjectApplication.class, args);
     }
@@ -53,10 +53,12 @@ public class BankProjectApplication {
     public String registerUser(@RequestParam String name, @RequestParam String surname, @RequestParam String password, Model model) {
         logger.info("Registering user");
         User user = new User(name, surname, password, new BankAccount(0));
-        DATABASE.registerUser(user);
-        model.addAttribute("message", "Registration successful! Please login.");
+        Thread registerThread = new Thread(new RegisterUserThread(user));
+        registerThread.start();
+        model.addAttribute("message", "Registration in progress! Please wait.");
         return "redirect:/login?name=";
     }
+
 
 
     @GetMapping("/main")
