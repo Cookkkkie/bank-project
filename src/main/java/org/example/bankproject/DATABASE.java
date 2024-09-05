@@ -8,18 +8,14 @@ import java.sql.*;
 
 @Component
 public class DATABASE {
-    private Connection connection;
-    private static Statement statement;
 
-    DATABASE() throws SQLException {
 
-    }
-    private static final Logger logger = LogManager.getLogger(BankProjectApplication.class);
+    private static final Logger logger = LogManager.getLogger(DATABASE.class);
 
     public static void main(String[] args) {
         try (
                 Connection connection = DriverManager.getConnection("jdbc:sqlite:bank.db");
-                Statement statement = connection.createStatement();
+                Statement statement = connection.createStatement()
         ) {
             String createTableSQL = "CREATE TABLE IF NOT EXISTS users (" +
                                         "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -38,7 +34,7 @@ public class DATABASE {
     public static void registerUser(User user) {
         try (
                 Connection connection = DriverManager.getConnection("jdbc:sqlite:bank.db");
-                Statement statement = connection.createStatement();
+                Statement statement = connection.createStatement()
         ) {
             String insertSQL = String.format("INSERT INTO users (name, second_name, password, balance) " +
                             "VALUES ('%s', '%s', '%s', %f)",
@@ -57,11 +53,11 @@ public class DATABASE {
     public static User readUser(String name) {
         try (
                 Connection connection = DriverManager.getConnection("jdbc:sqlite:bank.db");
-                Statement statement = connection.createStatement();
+                Statement statement = connection.createStatement()
         ) {
             String querySQL = String.format("SELECT * FROM users WHERE name = '%s'",name );
             ResultSet resultSet = statement.executeQuery(querySQL);
-            while (resultSet.next()) {
+            if (resultSet.next()) {
                 String secondName = resultSet.getString("second_name");
                 double balance = resultSet.getDouble("balance");
                 return new User(name, secondName, new BankAccount(balance));
@@ -75,14 +71,11 @@ public class DATABASE {
     }
 
     public static User readUserLogin(String name, String password) {
-//        String firstName=name.split(" ")[0];
-//        String lastName=name.split(" ")[1];
-//        logger.info(firstName+" "+lastName+" "+password);
+
         try (
                 Connection connection = DriverManager.getConnection("jdbc:sqlite:bank.db");
-                Statement statement = connection.createStatement();
+                Statement statement = connection.createStatement()
         ) {
-//            logger.info(String.format("SELECT * FROM users WHERE name = '%s' and second_name = '%s' and password = '%s'",firstName, lastName, password));
             String querySQL = String.format("SELECT * FROM users WHERE name = '%s' and password = '%s';",name, password);
             ResultSet resultSet = statement.executeQuery(querySQL);
             if(resultSet.next()) {
@@ -98,7 +91,7 @@ public class DATABASE {
         return null;
     }
 
-    public static void sendMoney(String firstName, String lastName, double amount, String sender) throws SQLException {
+    public static void sendMoney(String firstName, String lastName, double amount, String sender){
         User senderUser = readUser(sender);
 
         String selectSenderQuery = "SELECT * FROM users WHERE name = ? AND second_name = ?";
@@ -112,6 +105,7 @@ public class DATABASE {
                 PreparedStatement updateUserBalanceStmt = connection.prepareStatement(updateUserBalanceQuery)
         ) {
 
+            assert senderUser != null;
             selectSenderStmt.setString(1, senderUser.getName());
             selectSenderStmt.setString(2, senderUser.getSecondName());
 
@@ -153,7 +147,6 @@ public class DATABASE {
             }
         } catch (SQLException e) {
             logger.error("Error during money transfer", e);
-            throw e;
         }
     }
 
@@ -165,13 +158,13 @@ public class DATABASE {
 
         try (
                 Connection connection = DriverManager.getConnection("jdbc:sqlite:bank.db");
-                Statement statement = connection.createStatement();
+                Statement statement = connection.createStatement()
         ) {
             String updateSQL = String.format("UPDATE users SET balance = '%f' WHERE name = '%s' and second_name = '%s';",balance,name,secondName);
             statement.executeUpdate(updateSQL);
         }
         catch (SQLException e) {
-            System.out.println(e.toString());
+            logger.error("Error: ", e);
         }
     }
 }

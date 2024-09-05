@@ -8,8 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.SQLException;
-
 
 @SpringBootApplication
 @Controller
@@ -38,7 +36,7 @@ public class BankProjectApplication {
     }
 
     @PostMapping("/login")
-    public String loginUser(@RequestParam String name, @RequestParam String password,  Model model) {
+    public String loginUser(@RequestParam String name, @RequestParam String password, Model model) {
         User user = DATABASE.readUserLogin(name, password);
         if (user != null) {
             model.addAttribute("user", user);
@@ -53,12 +51,10 @@ public class BankProjectApplication {
     public String registerUser(@RequestParam String name, @RequestParam String surname, @RequestParam String password, Model model) {
         logger.info("Registering user");
         User user = new User(name, surname, password, new BankAccount(0));
-        Thread registerThread = new Thread(new RegisterUserThread(user));
-        registerThread.start();
+        DATABASE.registerUser(user);
         model.addAttribute("message", "Registration in progress! Please wait.");
         return "redirect:/login?name=";
     }
-
 
 
     @GetMapping("/main")
@@ -76,6 +72,7 @@ public class BankProjectApplication {
     @PostMapping("/deposit")
     public String deposit(@RequestParam double amount, @RequestParam String name) {
         User user = DATABASE.readUser(name);
+        assert user != null;
         BankAccount bankAccount = user.getBankAccount();
         bankAccount.deposit(amount);
         DATABASE.updateBalance(user);
@@ -84,8 +81,9 @@ public class BankProjectApplication {
 
 
     @PostMapping("/withdraw")
-    public String widthdraw(@RequestParam double amount, @RequestParam String name) {
+    public String withdraw(@RequestParam double amount, @RequestParam String name) {
         User user = DATABASE.readUser(name);
+        assert user != null;
         BankAccount bankAccount = user.getBankAccount();
         bankAccount.withdraw(amount);
         DATABASE.updateBalance(user);
@@ -93,7 +91,7 @@ public class BankProjectApplication {
     }
 
     @PostMapping("/send_money")
-    public String send_money(@RequestParam String receiverN, @RequestParam String receiverS, @RequestParam double amount, @RequestParam String name) throws SQLException {
+    public String send_money(@RequestParam String receiverN, @RequestParam String receiverS, @RequestParam double amount, @RequestParam String name){
         DATABASE.sendMoney(receiverN, receiverS, amount, name);
         return "redirect:/main?name=" + name;
     }
