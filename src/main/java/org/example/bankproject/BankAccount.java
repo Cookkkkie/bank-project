@@ -1,21 +1,25 @@
 package org.example.bankproject;
 
+import java.util.concurrent.ThreadLocalRandom;
 
 public class BankAccount {
     private double balance;
+    private final String bankAccountNumber;
 
     public BankAccount() {
         this.balance = 0;
+        this.bankAccountNumber = String.valueOf(ThreadLocalRandom.current().nextInt(100000, 999999 + 1));
     }
 
     public BankAccount(double balance) {
         this.balance = balance;
+        this.bankAccountNumber = String.valueOf(ThreadLocalRandom.current().nextInt(100000, 999999 + 1));
     }
 
-    public double getBalance() {return this.balance;}
+    public double getBalance() { return this.balance; }
+    public String getAccountNumber() { return bankAccountNumber; }
 
     public void deposit(double amount) {
-
         if (amount < 0) {
             System.out.println("Amount must be positive");
         } else {
@@ -25,8 +29,6 @@ public class BankAccount {
     }
 
     public void withdraw(double amount) {
-        amount = Math.abs(amount);
-
         if (amount > this.balance) {
             System.out.println("Insufficient funds!");
         } else {
@@ -34,5 +36,4 @@ public class BankAccount {
             System.out.println("You successfully withdrew " + amount + "$ from the bank.");
         }
     }
-
 }
