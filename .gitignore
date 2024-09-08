@@ -29,6 +29,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 .mvn
+mvn
+wmvnw.cmd
 
 ### VS Code ###
 .vscode/
