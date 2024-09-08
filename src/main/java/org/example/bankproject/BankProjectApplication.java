@@ -20,20 +20,15 @@ public class BankProjectApplication {
     }
 
     @GetMapping("/")
-    public String homePage() {
-        return "redirect:/login";
-    }
+    public String homePage() {return "redirect:/login";}
 
     @GetMapping("/login")
-    public String loginPage() {
-        return "login";
-    }
+    public String loginPage() {return "login";}
 
     @GetMapping("/register")
-    public String registerPage() {
-        return "register";
-    }
+    public String registerPage() {return "register";}
 
+    
     @GetMapping("/main")
     public String mainPage(@RequestParam String email, Model model) {
         User user = DATABASE.readUserByEmail(email);
@@ -75,7 +70,6 @@ public class BankProjectApplication {
         DATABASE.updateBalance(user);
         return "redirect:/main?email=" + email;
     }
-
 
     @PostMapping("/withdraw")
     public String withdraw(@RequestParam double amount, @RequestParam String email) {

@@ -17,29 +17,14 @@ public class User {
     }
 
 
-    public String getName() {
-        return name;
-    }
+    public String getName() {return name;}
 
+    public String getSecondName() {return surname;    }
 
-    public String getSecondName() {
-        return surname;
-    }
+    public String getEmail() {return email;}
 
+    public String getPassword() {return password;}
 
-
-    public String getEmail() {
-        return email;
-    }
-
-
-    public String getPassword() {
-        return password;
-    }
-
-    public BankAccount getBankAccount() {
-        return bankAccount;
-    }
-
+    public BankAccount getBankAccount() {return bankAccount;}
 
 }
